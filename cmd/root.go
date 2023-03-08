@@ -7,6 +7,8 @@ import (
 	"context"
 	"os"
 
+	"github.com/pkg/errors"
+
 	"github.com/hklauke/kubesh/client"
 	"github.com/hklauke/kubesh/kubesh"
 
@@ -19,16 +21,8 @@ var namespace string
 var rootCmd = &cobra.Command{
 	Use:   "kubesh pod-query",
 	Short: "kubeshell into a pod",
-	//Long:  "a long description",
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) {
-	// 	if len(os.Args) < 2 {
-	// 		panic("Must include at least one argument")
-	// 	}
-	// },
-
-	//TODO: If no args print help
+	Long:  "a long description",
+	RunE:  run,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -38,7 +32,12 @@ func Execute() {
 	if err != nil {
 		os.Exit(1)
 	}
+}
 
+func run(cmd *cobra.Command, args []string) error {
+	if len(args) == 0 {
+		return errors.New("missing pod query")
+	}
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	myClientSet, myClientConfig, err := client.GetLocal()
@@ -52,6 +51,7 @@ func Execute() {
 	pod, container := kubesh.GetPrompt(matchSlice, containerMap)
 
 	kubesh.StartConn(ctx, namespace, myClientSet, myClientConfig, pod, container)
+	return nil
 
 }
 
@@ -71,5 +71,5 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 
-	rootCmd.PersistentFlags().StringVarP(&namespace, "namespace", "n", "", "desired kubernetes namespace")
+	rootCmd.PersistentFlags().StringVarP(&namespace, "namespace", "n", "", "desired kubernetes namespace, defaults to all")
 }

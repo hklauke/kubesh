@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/manifoldco/promptui v0.9.0
+	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.29.0
 	github.com/spf13/cobra v1.6.1
 	golang.org/x/term v0.5.0
