@@ -5,7 +5,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	"github.com/hklauke/kubesh/client"
@@ -14,13 +13,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var namespaceVar string
-
-type shQuery struct {
-	pod       string
-	container string
-	namespace string
-}
+var namespace string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -41,9 +34,6 @@ var rootCmd = &cobra.Command{
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	config := shQuery{
-		namespace: namespaceVar,
-	}
 	err := rootCmd.Execute()
 	if err != nil {
 		os.Exit(1)
@@ -58,11 +48,10 @@ func Execute() {
 		panic("Empty Client config")
 	}
 
-	matchSlice, containerMap := kubesh.GetResources(ctx, config, myClientSet)
+	matchSlice, containerMap := kubesh.GetResources(ctx, namespace, myClientSet)
 	pod, container := kubesh.GetPrompt(matchSlice, containerMap)
-	fmt.Printf("%T", myClientSet)
-	fmt.Println(pod, container)
-	//kubesh.StartConn(ctx, namespaceVar, myClientSet, myClientConfig, pod, container)
+
+	kubesh.StartConn(ctx, namespace, myClientSet, myClientConfig, pod, container)
 
 }
 
@@ -82,5 +71,5 @@ func init() {
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 
-	rootCmd.PersistentFlags().StringVarP(&namespaceVar, "namespace", "n", "", "desired kubernetes namespace")
+	rootCmd.PersistentFlags().StringVarP(&namespace, "namespace", "n", "", "desired kubernetes namespace")
 }

@@ -11,8 +11,8 @@ import (
 )
 
 // GetResouces returns a list pods and their containers
-func GetResources(ctx context.Context, config *shQuery, client kubernetes.Interface) (podsList []string, containers map[string][]string) {
-	pods, err := client.CoreV1().Pods(config.namespace).List(ctx, metav1.ListOptions{})
+func GetResources(ctx context.Context, namespace string, client kubernetes.Interface) (podsList []string, containers map[string][]string) {
+	pods, err := client.CoreV1().Pods(namespace).List(ctx, metav1.ListOptions{})
 	var match []string
 	cMap := make(map[string][]string)
 	if err != nil {
