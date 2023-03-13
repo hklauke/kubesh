@@ -27,8 +27,8 @@ type options struct {
 }
 
 func (myOptions *options) initFlags(fs *pflag.FlagSet) {
-	rootCmd.PersistentFlags().StringVar(&myOptions.command, "c", "/bin/sh", "use a custom command, defaults to /bin/sh")
-	rootCmd.PersistentFlags().StringVarP(&myOptions.namespace, "namespace", "n", "", "desired kubernetes namespace, defaults to all")
+	fs.StringVar(&myOptions.command, "c", "/bin/sh", "use a custom command, defaults to /bin/sh")
+	fs.StringVarP(&myOptions.namespace, "namespace", "n", "", "desired kubernetes namespace, defaults to all")
 }
 
 // rootCmd represents the base command when called without any subcommands
