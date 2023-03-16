@@ -13,31 +13,25 @@ import (
 	"github.com/hklauke/kubesh/kubesh"
 
 	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 )
 
-var namespace string
-var customCom string
-
-type options struct {
-	namespace string
-	command   string
-	pod       string
-	container string
-}
-
-func (myOptions *options) initFlags(fs *pflag.FlagSet) {
-	fs.StringVar(&myOptions.command, "c", "/bin/sh", "use a custom command, defaults to /bin/sh")
-	fs.StringVarP(&myOptions.namespace, "namespace", "n", "", "desired kubernetes namespace, defaults to all")
+func init() {
+	rootCmd.PersistentFlags().StringVarP(&customCom, "command", "c", "/bin/sh", "use a custom command, defaults to /bin/sh")
+	rootCmd.PersistentFlags().StringVarP(&namespace, "namespace", "n", "", "desired kubernetes namespace, defaults to all")
 }
 
 // rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
-	Use:   "kubesh pod-query",
-	Short: "kubeshell into a pod",
-	Long:  "a long description",
-	RunE:  run,
-}
+var (
+	namespace string
+	customCom string
+
+	rootCmd = &cobra.Command{
+		Use:   "kubesh pod-query",
+		Short: "kubeshell into a pod",
+		Long:  "a long description",
+		RunE:  run,
+	}
+)
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
@@ -46,12 +40,11 @@ func Execute() {
 	if err != nil {
 		os.Exit(1)
 	}
+
 }
 
 func run(cmd *cobra.Command, args []string) error {
 
-	myOptions := options{}
-	myOptions.initFlags(cmd.Flags())
 	if len(args) == 0 {
 		return errors.New("missing pod query")
 	}
@@ -65,16 +58,16 @@ func run(cmd *cobra.Command, args []string) error {
 		panic("Empty Client config")
 	}
 
-	matchSlice, containerMap := kubesh.GetResources(ctx, myOptions.namespace, myClientSet)
+	matchSlice, containerMap := kubesh.GetResources(ctx, namespace, myClientSet)
 	pod, container := kubesh.GetPrompt(matchSlice, containerMap)
 
-	kubesh.StartConn(ctx, namespace, myClientSet, myClientConfig, pod, container)
+	kubesh.StartConn(ctx, namespace, myClientSet, myClientConfig, pod, container, customCom)
 	return nil
 
 }
 
 func errCheck(e error) {
 	if e != nil {
-		panic(e)
+		os.Exit(1)
 	}
 }
