@@ -20,7 +20,6 @@ The `pod` query is a string with partial match to your full pod name. You can al
  flag                        | default   | purpose
 -----------------------------|-----------|---------
  `--namespace`, `-n`    | ``   | If present use a specific namespace
------------------------------|-----------|---------
  `--command`, `-c`    | `/bin/sh`  | Specifies a command to run in the container 
 
 Kubesh will use the kubeconfig located in your home directory. 
