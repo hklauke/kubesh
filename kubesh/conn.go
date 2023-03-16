@@ -3,6 +3,7 @@ package kubesh
 import (
 	"context"
 	"os"
+	"strings"
 
 	"golang.org/x/term"
 	corev1 "k8s.io/api/core/v1"
@@ -12,8 +13,9 @@ import (
 	"k8s.io/client-go/tools/remotecommand"
 )
 
-func StartConn(ctx context.Context, namespace string, client kubernetes.Interface, config *restclient.Config, pod string, container string) {
+func StartConn(ctx context.Context, namespace string, client kubernetes.Interface, config *restclient.Config, pod string, container string, customCom string) {
 
+	comList := strings.Split(customCom, " ")
 	req := client.CoreV1().RESTClient().
 		Post().
 		Namespace(namespace).
@@ -22,7 +24,7 @@ func StartConn(ctx context.Context, namespace string, client kubernetes.Interfac
 		SubResource("exec").
 		VersionedParams(&corev1.PodExecOptions{
 			Container: container,
-			Command:   []string{"/bin/sh"},
+			Command:   comList,
 			Stdin:     true,
 			Stdout:    true,
 			Stderr:    true,
@@ -53,7 +55,7 @@ func StartConn(ctx context.Context, namespace string, client kubernetes.Interfac
 		Tty:    true,
 	})
 	if err != nil {
-		panic(err)
+		os.Exit(1)
 	}
 
 }
