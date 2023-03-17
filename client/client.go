@@ -1,6 +1,7 @@
 package client
 
 import (
+	"log"
 	"path/filepath"
 
 	"k8s.io/client-go/kubernetes"
@@ -30,13 +31,14 @@ func GetLocal() (*kubernetes.Clientset, *rest.Config, error) { //string, error) 
 
 	newConfig, err := config.ClientConfig()
 	if err != nil {
+
 		panic(err)
 	}
 
 	// create the clientset
 	clientset, err := kubernetes.NewForConfig(newConfig)
 	if err != nil {
-		panic(err.Error())
+		log.Fatal(err)
 	}
 
 	return clientset, newConfig, nil

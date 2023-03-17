@@ -17,7 +17,7 @@ import (
 
 func init() {
 	rootCmd.PersistentFlags().StringVarP(&customCom, "command", "c", "/bin/sh", "use a custom command, defaults to /bin/sh")
-	rootCmd.PersistentFlags().StringVarP(&namespace, "namespace", "n", "", "desired kubernetes namespace, defaults to all")
+	rootCmd.PersistentFlags().StringVarP(&namespace, "namespace", "n", "default", "desired kubernetes namespace, defaults to default")
 }
 
 // rootCmd represents the base command when called without any subcommands
@@ -40,7 +40,6 @@ func Execute() {
 	if err != nil {
 		os.Exit(1)
 	}
-
 }
 
 func run(cmd *cobra.Command, args []string) error {
@@ -52,10 +51,12 @@ func run(cmd *cobra.Command, args []string) error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	myClientSet, myClientConfig, err := client.GetLocal()
-	errCheck(err)
+	if err != nil {
+		os.Exit(1)
+	}
 
 	if myClientConfig == nil {
-		panic("Empty Client config")
+		errors.New("Empty Client config")
 	}
 
 	matchSlice, containerMap := kubesh.GetResources(ctx, namespace, myClientSet)
@@ -64,10 +65,4 @@ func run(cmd *cobra.Command, args []string) error {
 	kubesh.StartConn(ctx, namespace, myClientSet, myClientConfig, pod, container, customCom)
 	return nil
 
-}
-
-func errCheck(e error) {
-	if e != nil {
-		os.Exit(1)
-	}
 }

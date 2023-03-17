@@ -27,7 +27,7 @@ func GetPrompt(pods []string, containers map[string][]string) (pod string, conta
 	}
 
 	fmt.Println("You choose ", pod_result, pod_container)
-
+	fmt.Println("")
 	return pod_result, pod_container
 
 }

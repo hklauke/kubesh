@@ -2,6 +2,7 @@ package kubesh
 
 import (
 	"context"
+	"log"
 	"os"
 	"strings"
 
@@ -14,7 +15,6 @@ import (
 )
 
 func StartConn(ctx context.Context, namespace string, client kubernetes.Interface, config *restclient.Config, pod string, container string, customCom string) {
-
 	comList := strings.Split(customCom, " ")
 	req := client.CoreV1().RESTClient().
 		Post().
@@ -55,7 +55,7 @@ func StartConn(ctx context.Context, namespace string, client kubernetes.Interfac
 		Tty:    true,
 	})
 	if err != nil {
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 }
